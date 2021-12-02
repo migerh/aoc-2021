@@ -9,6 +9,19 @@ enum Direction {
     Down,
 }
 
+impl FromStr for Direction {
+    type Err = ParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "forward" => Ok(Direction::Forward),
+            "up" => Ok(Direction::Up),
+            "down" => Ok(Direction::Down),
+            _ => Err(ParseError::new("Invalid direction")),
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct Command {
     dir: Direction,
@@ -20,20 +33,16 @@ impl FromStr for Command {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         lazy_static!{
-            static ref RE: Regex = Regex::new(r"^(.*)? (\d)$").unwrap();
+            static ref RE: Regex = Regex::new(r"^(?P<dir>.*)? (?P<len>\d)$").unwrap();
         }
 
-        let cap = RE.captures(s).unwrap();
-        let dir_str = cap[1].to_lowercase();
-        let len = cap[2].parse::<i32>()?;
+        let (dir, len) = RE.captures(s).and_then(|cap| {
+            let dir = cap.name("dir").map(|v| v.as_str().to_lowercase())?;
+            let dir = Direction::from_str(&dir).ok()?;
+            let len = cap[2].parse::<i32>().ok()?;
 
-        let dir = if dir_str == "forward" {
-            Direction::Forward
-        } else if dir_str == "up" {
-            Direction::Up
-        } else {
-            Direction::Down
-        };
+            Some((dir, len))
+        }).ok_or(ParseError::new("Error during parse"))?;
 
         Ok(Self { dir, len })
     }
@@ -49,7 +58,7 @@ pub fn input_generator(input: &str) -> Result<Vec<Command>, ParseError> {
 }
 
 #[aoc(day2, part1)]
-pub fn solve_part1(input: &Vec<Command>) -> Result<i32, ParseError> {
+pub fn solve_part1(input: &Vec<Command>) -> i32 {
     let (horizontal, depth) = input.into_iter().fold((0, 0), |acc, c| {
         match (c.dir, c.len) {
             (Direction::Forward, v) => (acc.0 + v, acc.1),
@@ -58,11 +67,11 @@ pub fn solve_part1(input: &Vec<Command>) -> Result<i32, ParseError> {
         }
     });
 
-    Ok(horizontal * depth)
+    horizontal * depth
 }
 
 #[aoc(day2, part2)]
-pub fn solve_part2(input: &Vec<Command>) -> Result<i32, std::num::ParseIntError> {
+pub fn solve_part2(input: &Vec<Command>) -> i32 {
     let (horizontal, depth, _aim) = input.into_iter().fold((0, 0, 0), |acc, c| {
         match (c.dir, c.len) {
             (Direction::Forward, v) => (acc.0 + v, acc.1 + v * acc.2, acc.2),
@@ -71,7 +80,7 @@ pub fn solve_part2(input: &Vec<Command>) -> Result<i32, std::num::ParseIntError>
         }
     });
 
-    Ok(horizontal * depth)
+    horizontal * depth
 }
 
 #[cfg(test)]
