@@ -104,12 +104,12 @@ forward 2"
     #[test]
     fn part1_sample() -> Result<(), ParseError> {
         let commands = input()?;
-        Ok(assert_eq!(150, solve_part1(&commands)?))
+        Ok(assert_eq!(150, solve_part1(&commands)))
     }
 
     #[test]
     fn part2_sample() -> Result<(), ParseError> {
         let commands = input()?;
-        Ok(assert_eq!(900, solve_part2(&commands)?))
+        Ok(assert_eq!(900, solve_part2(&commands)))
     }
 }
