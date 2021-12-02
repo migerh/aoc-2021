@@ -39,7 +39,7 @@ impl FromStr for Command {
         let (dir, len) = RE.captures(s).and_then(|cap| {
             let dir = cap.name("dir").map(|v| v.as_str().to_lowercase())?;
             let dir = Direction::from_str(&dir).ok()?;
-            let len = cap[2].parse::<i32>().ok()?;
+            let len = cap.name("len").map(|v| v.as_str().parse::<i32>())?.ok()?;
 
             Some((dir, len))
         }).ok_or(ParseError::new("Error during parse"))?;
