@@ -23,28 +23,25 @@ fn calculate_fuel(crabs: &Vec<i32>, alignment: i32, fuel_consumption: fn(i32) ->
     crabs.iter().map(|c| fuel_consumption((c - alignment).abs())).sum()
 }
 
-#[aoc(day7, part1)]
-pub fn solve_part1(input: &Vec<i32>) -> Result<i32, ParseError> {
-    let max = *input.iter().max().ok_or(ParseError::new("There are no crabs?"))?;
+fn solve(crabs: &Vec<i32>, fuel_consumption: fn(i32) -> i32) -> Result<i32, ParseError> {
+    let max = *crabs.iter().max().ok_or(ParseError::new("There are no crabs?"))?;
 
     let min_fuel = (0..=max)
-        .map(|alignment| calculate_fuel(input, alignment, fuel_consumption_id))
+        .map(|alignment| calculate_fuel(crabs, alignment, fuel_consumption))
         .min()
         .ok_or(ParseError::new("No fuel?"))?;
 
     Ok(min_fuel)
 }
 
+#[aoc(day7, part1)]
+pub fn solve_part1(input: &Vec<i32>) -> Result<i32, ParseError> {
+    solve(input, fuel_consumption_id)
+}
+
 #[aoc(day7, part2)]
 pub fn solve_part2(input: &Vec<i32>) -> Result<i32, ParseError> {
-    let max = *input.iter().max().ok_or(ParseError::new("There are no crabs?"))?;
-
-    let min_fuel = (0..=max)
-        .map(|alignment| calculate_fuel(input, alignment, fuel_consumption_gauss))
-        .min()
-        .ok_or(ParseError::new("No fuel?"))?;
-
-    Ok(min_fuel)
+    solve(input, fuel_consumption_gauss)
 }
 
 #[cfg(test)]
