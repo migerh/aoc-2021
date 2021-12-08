@@ -6,8 +6,8 @@ type Item = Signal;
 
 #[derive(Debug)]
 pub struct Signal {
-    input: Vec<String>,
-    output: Vec<String>,
+    input: Vec<Vec<char>>,
+    output: Vec<Vec<char>>,
 }
 
 impl FromStr for Signal {
@@ -19,8 +19,8 @@ impl FromStr for Signal {
             .map(|v| v.to_owned())
             .collect::<Vec<_>>();
 
-        let input = stuff[0].split(" ").filter(|s| *s != "").map(|v| v.to_owned()).collect::<Vec<_>>();
-        let output = stuff[1].split(" ").filter(|s| *s != "").map(|v| v.to_owned()).collect::<Vec<_>>();
+        let input = stuff[0].split(" ").filter(|s| *s != "").map(|v| v.chars().collect::<Vec<_>>()).collect::<Vec<_>>();
+        let output = stuff[1].split(" ").filter(|s| *s != "").map(|v| v.chars().collect::<Vec<_>>()).collect::<Vec<_>>();
         Ok(Signal { input, output })
     }
 }
@@ -51,13 +51,13 @@ pub fn solve_part1(signals: &Vec<Item>) -> Result<usize, ParseError> {
     Ok(sum)
 }
 
-pub fn how_often(c: char, input: &Vec<String>) -> usize {
-    input.iter().filter(|v| v.contains(c)).count()
+pub fn how_often(c: char, input: &Vec<Vec<char>>) -> usize {
+    input.iter().filter(|v| v.contains(&c)).count()
 }
 
-pub fn decode_digit(map: &HashMap<char, char>, code: &str) -> Result<usize, ParseError> {
+pub fn decode_digit(map: &HashMap<char, char>, code: &Vec<char>) -> Result<usize, ParseError> {
     let mut codeout = code
-        .chars()
+        .iter()
         .map(|c| map.get(&c).ok_or(ParseError::new("Cannot map code")))
         .collect::<Result<Vec<_>, ParseError>>()?
         .iter()
@@ -83,7 +83,7 @@ pub fn decode_digit(map: &HashMap<char, char>, code: &str) -> Result<usize, Pars
     })
 }
 
-pub fn decode(map: &HashMap<char, char>, code: &Vec<String>) -> Result<usize, ParseError> {
+pub fn decode(map: &HashMap<char, char>, code: &Vec<Vec<char>>) -> Result<usize, ParseError> {
     let len = code.len();
 
     code.iter().enumerate()
@@ -105,8 +105,8 @@ pub fn solve_part2(signals: &Vec<Item>) -> Result<usize, ParseError> {
         let mut map: HashMap<char, char> = HashMap::new();
 
         // 1 has 2 wires, identify c & f
-        let one = i.iter().filter(|v| v.len() == 2).next().ok_or(error.clone())?.chars().collect::<Vec<_>>();
-        if how_often(one[0], &i) == 8 {
+        let one = i.iter().filter(|v| v.len() == 2).next().ok_or(error.clone())?;
+        if how_often(one[0], i) == 8 {
             map.entry(one[0]).or_insert('c');
             map.entry(one[1]).or_insert('f');
         } else {
@@ -115,14 +115,14 @@ pub fn solve_part2(signals: &Vec<Item>) -> Result<usize, ParseError> {
         }
 
         // 7 has 3 wires, identify a
-        let seven = i.iter().filter(|v| v.len() == 3).next().ok_or(error.clone())?.chars().collect::<Vec<_>>();
+        let seven = i.iter().filter(|v| v.len() == 3).next().ok_or(error.clone())?;
         let unmapped = seven.iter().filter(|v| !map.contains_key(v)).next().ok_or(error.clone())?;
         map.entry(*unmapped).or_insert('a');
 
         // 4 has 2 unidentified wires, identify b and d
-        let four = i.iter().filter(|v| v.len() == 4).next().ok_or(error.clone())?.chars().collect::<Vec<_>>();
+        let four = i.iter().filter(|v| v.len() == 4).next().ok_or(error.clone())?;
         let unmapped = four.iter().filter(|v| !map.contains_key(v)).cloned().collect::<Vec<_>>();
-        if how_often(unmapped[0], &i) == 6 {
+        if how_often(unmapped[0], i) == 6 {
             map.entry(unmapped[0]).or_insert('b');
             map.entry(unmapped[1]).or_insert('d');
         } else {
@@ -131,9 +131,9 @@ pub fn solve_part2(signals: &Vec<Item>) -> Result<usize, ParseError> {
         }
 
         // pick 8, identify e and g
-        let eight = i.iter().filter(|v| v.len() == 7).next().ok_or(error.clone())?.chars().collect::<Vec<_>>();
+        let eight = i.iter().filter(|v| v.len() == 7).next().ok_or(error.clone())?;
         let unmapped = eight.iter().filter(|v| !map.contains_key(v)).cloned().collect::<Vec<_>>();
-        if how_often(unmapped[0], &i) == 4 {
+        if how_often(unmapped[0], i) == 4 {
             map.entry(unmapped[0]).or_insert('e');
             map.entry(unmapped[1]).or_insert('g');
         } else {
