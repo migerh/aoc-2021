@@ -114,7 +114,7 @@ pub fn solve_part2(signals: &Vec<Item>) -> Result<usize, ParseError> {
         // 7 has 3 wires, identify a
         // it's the only wire in 7 not yet identified
         let seven = i.iter().find(|v| v.len() == 3).ok_or(error.clone())?;
-        let unmapped = seven.iter().filter(|v| !map.contains_key(v)).next().ok_or(error.clone())?;
+        let unmapped = seven.iter().find(|v| !map.contains_key(v)).ok_or(error.clone())?;
         map.entry(*unmapped).or_insert('a');
 
         // 4 has 2 unidentified wires, identify b and d
