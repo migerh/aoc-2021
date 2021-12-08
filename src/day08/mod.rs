@@ -38,17 +38,14 @@ pub fn input_generator(input: &str) -> Result<Vec<Item>, ParseError> {
 pub fn solve_part1(signals: &Vec<Item>) -> Result<usize, ParseError> {
     let output = signals.iter().map(|s| s.output.clone()).collect::<Vec<_>>();
     let relevant_lengths: Vec<usize> = vec![2, 4, 3, 7];
-    let mut sum = 0;
 
-    for o in output {
-        for s in o {
-            if relevant_lengths.contains(&s.len()) {
-                sum += 1;
-            }
-        }
-    }
-
-    Ok(sum)
+    Ok(output
+        .iter()
+        .map(|s| s
+            .iter()
+            .filter(|t| relevant_lengths.contains(&t.len()))
+            .count())
+        .sum())
 }
 
 pub fn how_often(c: char, input: &Vec<Vec<char>>) -> usize {
