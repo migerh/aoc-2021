@@ -55,12 +55,20 @@ pub fn how_often(c: char, input: &Vec<String>) -> usize {
     input.iter().filter(|v| v.contains(c)).count()
 }
 
-pub fn decode_digit(map: &HashMap<char, char>, code: &str) -> usize {
-    let mut codeout = code.chars().map(|c| map.get(&c).unwrap()).cloned().collect::<Vec<_>>();
+pub fn decode_digit(map: &HashMap<char, char>, code: &str) -> Result<usize, ParseError> {
+    let mut codeout = code
+        .chars()
+        .map(|c| map.get(&c).ok_or(ParseError::new("Cannot map code")))
+        .collect::<Result<Vec<_>, ParseError>>()?
+        .iter()
+        .map(|v| v.clone())
+        .cloned()
+        .collect::<Vec<_>>();
+
     codeout.sort();
     let code_sorted = codeout.iter().collect::<String>();
 
-    match code_sorted.as_str() {
+    Ok(match code_sorted.as_str() {
         "abcefg" => 0,
         "cf" => 1,
         "acdeg" => 2,
@@ -71,32 +79,33 @@ pub fn decode_digit(map: &HashMap<char, char>, code: &str) -> usize {
         "acf" => 7,
         "abcdefg" => 8,
         "abcdfg" => 9,
-        _ => panic!("Unknown code"),
-    }
+        _ => Err(ParseError::new("Unknown wire configuration"))?,
+    })
 }
 
-pub fn decode(map: &HashMap<char, char>, code: &Vec<String>) -> usize {
+pub fn decode(map: &HashMap<char, char>, code: &Vec<String>) -> Result<usize, ParseError> {
     let len = code.len();
 
     code.iter().enumerate()
         .map(|(i, s)| {
-            let d = decode_digit(map, &s);
-            (10 as usize).pow((len - 1 - i) as u32) * d
+            let d = decode_digit(map, &s)?;
+            Ok((10 as usize).pow((len - 1 - i) as u32) * d)
         })
-        .sum()
+        .try_fold(0, |acc, d: Result<usize, ParseError>| Ok(acc + d?))
 }
 
 #[aoc(day8, part2)]
 pub fn solve_part2(signals: &Vec<Item>) -> Result<usize, ParseError> {
     let input = signals.iter().map(|s| s.input.clone()).collect::<Vec<_>>();
     let output = signals.iter().map(|s| s.output.clone()).collect::<Vec<_>>();
+    let error = ParseError::new("Could not find wiring configuration");
 
     let mut sum = 0;
     for (k, i) in input.iter().enumerate() {
         let mut map: HashMap<char, char> = HashMap::new();
 
         // 1 has 2 wires, identify c & f
-        let one = i.iter().filter(|v| v.len() == 2).next().unwrap().chars().collect::<Vec<_>>();
+        let one = i.iter().filter(|v| v.len() == 2).next().ok_or(error.clone())?.chars().collect::<Vec<_>>();
         if how_often(one[0], &i) == 8 {
             map.entry(one[0]).or_insert('c');
             map.entry(one[1]).or_insert('f');
@@ -106,12 +115,12 @@ pub fn solve_part2(signals: &Vec<Item>) -> Result<usize, ParseError> {
         }
 
         // 7 has 3 wires, identify a
-        let seven = i.iter().filter(|v| v.len() == 3).next().unwrap().chars().collect::<Vec<_>>();
-        let unmapped = seven.iter().filter(|v| !map.contains_key(v)).next().unwrap();
+        let seven = i.iter().filter(|v| v.len() == 3).next().ok_or(error.clone())?.chars().collect::<Vec<_>>();
+        let unmapped = seven.iter().filter(|v| !map.contains_key(v)).next().ok_or(error.clone())?;
         map.entry(*unmapped).or_insert('a');
 
         // 4 has 2 unidentified wires, identify b and d
-        let four = i.iter().filter(|v| v.len() == 4).next().unwrap().chars().collect::<Vec<_>>();
+        let four = i.iter().filter(|v| v.len() == 4).next().ok_or(error.clone())?.chars().collect::<Vec<_>>();
         let unmapped = four.iter().filter(|v| !map.contains_key(v)).cloned().collect::<Vec<_>>();
         if how_often(unmapped[0], &i) == 6 {
             map.entry(unmapped[0]).or_insert('b');
@@ -122,7 +131,7 @@ pub fn solve_part2(signals: &Vec<Item>) -> Result<usize, ParseError> {
         }
 
         // pick 8, identify e and g
-        let eight = i.iter().filter(|v| v.len() == 7).next().unwrap().chars().collect::<Vec<_>>();
+        let eight = i.iter().filter(|v| v.len() == 7).next().ok_or(error.clone())?.chars().collect::<Vec<_>>();
         let unmapped = eight.iter().filter(|v| !map.contains_key(v)).cloned().collect::<Vec<_>>();
         if how_often(unmapped[0], &i) == 4 {
             map.entry(unmapped[0]).or_insert('e');
@@ -133,7 +142,7 @@ pub fn solve_part2(signals: &Vec<Item>) -> Result<usize, ParseError> {
         }
 
         let out = output[k].iter().map(|v| v.clone()).collect::<Vec<_>>();
-        sum += decode(&map, &out);
+        sum += decode(&map, &out)?;
     }
 
     Ok(sum)

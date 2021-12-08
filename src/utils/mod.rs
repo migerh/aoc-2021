@@ -40,7 +40,7 @@ impl fmt::Display for Error {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ParseError {
   pub what: String
 }
