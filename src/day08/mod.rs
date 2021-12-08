@@ -57,8 +57,8 @@ pub fn decode_digit(map: &HashMap<char, char>, code: &Vec<char>) -> Result<usize
         .iter()
         .map(|c| map.get(&c).ok_or(ParseError::new("Cannot map code")))
         .collect::<Result<Vec<_>, ParseError>>()?
-        .iter()
-        .map(|v| **v)
+        .into_iter()
+        .map(|v| *v)
         .collect::<Vec<_>>();
 
     codeout.sort();
