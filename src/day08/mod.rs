@@ -102,7 +102,7 @@ pub fn solve_part2(signals: &Vec<Item>) -> Result<usize, ParseError> {
 
         // 1 has 2 wires, identify c & f
         // across all digits, c appears 8 times, f appears 9 times
-        let one = i.iter().filter(|v| v.len() == 2).next().ok_or(error.clone())?;
+        let one = i.iter().find(|v| v.len() == 2).ok_or(error.clone())?;
         if how_often(one[0], i) == 8 {
             map.entry(one[0]).or_insert('c');
             map.entry(one[1]).or_insert('f');
@@ -113,13 +113,13 @@ pub fn solve_part2(signals: &Vec<Item>) -> Result<usize, ParseError> {
 
         // 7 has 3 wires, identify a
         // it's the only wire in 7 not yet identified
-        let seven = i.iter().filter(|v| v.len() == 3).next().ok_or(error.clone())?;
+        let seven = i.iter().find(|v| v.len() == 3).ok_or(error.clone())?;
         let unmapped = seven.iter().filter(|v| !map.contains_key(v)).next().ok_or(error.clone())?;
         map.entry(*unmapped).or_insert('a');
 
         // 4 has 2 unidentified wires, identify b and d
         // across all digits, b appears 6 times, d appears 7 times
-        let four = i.iter().filter(|v| v.len() == 4).next().ok_or(error.clone())?;
+        let four = i.iter().find(|v| v.len() == 4).ok_or(error.clone())?;
         let unmapped = four.iter().filter(|v| !map.contains_key(v)).cloned().collect::<Vec<_>>();
         if how_often(unmapped[0], i) == 6 {
             map.entry(unmapped[0]).or_insert('b');
@@ -131,7 +131,7 @@ pub fn solve_part2(signals: &Vec<Item>) -> Result<usize, ParseError> {
 
         // pick 8, identify e and g
         // across all digits, e appears 4 times, g appears 7 times
-        let eight = i.iter().filter(|v| v.len() == 7).next().ok_or(error.clone())?;
+        let eight = i.iter().find(|v| v.len() == 7).ok_or(error.clone())?;
         let unmapped = eight.iter().filter(|v| !map.contains_key(v)).cloned().collect::<Vec<_>>();
         if how_often(unmapped[0], i) == 4 {
             map.entry(unmapped[0]).or_insert('e');
