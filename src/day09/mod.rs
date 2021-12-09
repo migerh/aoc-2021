@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::num::ParseIntError;
 use crate::utils::ParseError;
 
-type C = i32;
+type C = isize;
 type Coords = (C, C);
 type Item = i32;
 
@@ -16,22 +16,19 @@ pub fn input_generator(input: &str) -> Result<Vec<Vec<Item>>, ParseIntError> {
 }
 
 fn build_map(input: &Vec<Vec<i32>>) -> HashMap<Coords, Item> {
-    let mut map = HashMap::new();
-
     input.iter()
         .enumerate()
-        .for_each(|(y, r)| {
+        .map(|(y, r)| {
             r.iter()
             .enumerate()
-            .for_each(|(x, v)| { map.entry((x as i32, y as i32)).or_insert(*v); })
-        }
-        );
-
-    map
+            .map(move |(x, v)| ((x as isize, y as isize), *v))
+        })
+        .flatten()
+        .collect::<HashMap<_, _>>()
 }
 
 fn is_minimum(map: &HashMap<Coords, Item>, c: &Coords) -> bool {
-    let delta: Vec<i32> = vec![-1, 1];
+    let delta: Vec<isize> = vec![-1, 1];
 
     if let Some(value) = map.get(c) {
         for x in &delta {
@@ -53,7 +50,7 @@ fn is_minimum(map: &HashMap<Coords, Item>, c: &Coords) -> bool {
         return true;
     }
 
-    true
+    false
 }
 
 #[aoc(day9, part1)]
