@@ -11,11 +11,14 @@ pub fn input_generator(input: &str) -> Result<Vec<Vec<Item>>, ParseIntError> {
     input
         .lines()
         .filter(|s| *s != "")
-        .map(|s| s.chars().map(|c| c.to_string()).filter(|c| c != "\n").map(|c| c.parse::<Item>()).collect::<Result<Vec<_>, ParseIntError>>())
+        .map(|s| s.chars()
+            .map(|c| c.to_string())
+            .filter(|c| c != "\n")
+            .map(|c| c.parse::<Item>()).collect::<Result<Vec<_>, ParseIntError>>())
         .collect::<Result<Vec<_>, ParseIntError>>()
 }
 
-fn build_map(input: &Vec<Vec<i32>>) -> HashMap<Coords, Item> {
+fn build_map(input: &Vec<Vec<Item>>) -> HashMap<Coords, Item> {
     input.iter()
         .enumerate()
         .map(|(y, r)| {
@@ -54,12 +57,13 @@ fn is_minimum(map: &HashMap<Coords, Item>, c: &Coords) -> bool {
 }
 
 #[aoc(day9, part1)]
-pub fn solve_part1(input: &Vec<Vec<i32>>) -> Result<Item, ParseError> {
+pub fn solve_part1(input: &Vec<Vec<Item>>) -> Result<Item, ParseError> {
     let map = build_map(input);
 
     let risk_levels = map.iter()
         .filter(|(c, _)| is_minimum(&map, *c))
-        .map(|(_, v)| v + 1).sum();
+        .map(|(_, v)| v + 1)
+        .sum();
 
     Ok(risk_levels)
 }
@@ -96,11 +100,18 @@ fn basin_size(map: &HashMap<Coords, Item>, c: &Coords) -> usize {
 pub fn solve_part2(input: &Vec<Vec<Item>>) -> Result<usize, ParseError> {
     let map = build_map(input);
 
-    let minima = map.iter().filter(|(c, _)| is_minimum(&map, *c)).map(|(c, _)| c).collect::<Vec<_>>();
+    let minima = map.iter()
+        .filter(|(c, _)| is_minimum(&map, *c))
+        .map(|(c, _)| c)
+        .collect::<Vec<_>>();
 
-    let mut basin_sizes = minima.iter().map(|c| basin_size(&map, c)).collect::<Vec<_>>();
+    let mut basin_sizes = minima.iter()
+        .map(|c| basin_size(&map, c))
+        .collect::<Vec<_>>();
     basin_sizes.sort();
-    let result = basin_sizes.iter().skip(basin_sizes.len() - 3).product();
+    let result = basin_sizes.iter()
+        .skip(basin_sizes.len() - 3)
+        .product();
 
     Ok(result)
 }
@@ -118,7 +129,7 @@ mod test {
 9899965678"
     }
 
-    fn input() -> Result<Vec<Vec<i32>>, ParseError> {
+    fn input() -> Result<Vec<Vec<Item>>, ParseError> {
         Ok(input_generator(sample())?)
     }
 
