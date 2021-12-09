@@ -80,12 +80,11 @@ fn basin_size(map: &HashMap<Coords, Item>, c: &Coords) -> usize {
         visited.push(q);
 
         if let Some(v) = map.get(&q) {
-            if *v != 9 {
-                basin.push(*v);
-            } else {
+            if *v == 9 {
                 continue;
             }
 
+            basin.push(*v);
             for d in &delta {
                 queue.push((q.0 + d, q.1));
                 queue.push((q.0, q.1 + d));
