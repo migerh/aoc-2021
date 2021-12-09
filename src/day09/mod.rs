@@ -73,24 +73,22 @@ fn basin_size(map: &HashMap<Coords, Item>, c: &Coords) -> usize {
     let mut basin = vec![];
     let delta = vec![-1, 1];
 
-    while queue.len() > 0 {
-        if let Some(q) = queue.pop() {
-            if visited.contains(&q) {
+    while let Some(q) = queue.pop() {
+        if visited.contains(&q) {
+            continue;
+        }
+        visited.push(q);
+
+        if let Some(v) = map.get(&q) {
+            if *v != 9 {
+                basin.push(*v);
+            } else {
                 continue;
             }
-            visited.push(q);
 
-            if let Some(v) = map.get(&q) {
-                if *v != 9 {
-                    basin.push(*v);
-                } else {
-                    continue;
-                }
-
-                for d in &delta {
-                    queue.push((q.0 + d, q.1));
-                    queue.push((q.0, q.1 + d));
-                }
+            for d in &delta {
+                queue.push((q.0 + d, q.1));
+                queue.push((q.0, q.1 + d));
             }
         }
     }
