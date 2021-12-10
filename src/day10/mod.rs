@@ -23,28 +23,26 @@ fn parse_lines(input: &Vec<Vec<char>>) -> Result<Vec<ParseResult>, ParseError> {
 
     let mut result = vec![];
 
-    for line in input {
+    'outer: for line in input {
         let mut stack = vec![];
-        let mut ok = true;
-        for c in line {
-            if open.contains(c) {
-                stack.push(*c);
+        for character in line {
+            if open.contains(character) {
+                stack.push(*character);
                 continue;
             }
 
-            let index = close.iter().position(|v| v == c).ok_or(ParseError::new("Illegal character"))?;
-            let v = stack.pop().ok_or(ParseError::new("Stack is empty"))?;
-            let o = open.get(index).ok_or(ParseError::new("Could not find corresponding opening char"))?;
-            if *o != v {
-                result.push(ParseResult::Corrupted(*c));
-                ok = false;
-                break;
+            let index = close.iter().position(|v| v == character).ok_or(ParseError::new("Illegal character"))?;
+            let last = stack.pop().ok_or(ParseError::new("Stack is empty"))?;
+            let expected = open.get(index).ok_or(ParseError::new("Could not find corresponding opening char"))?;
+            if *expected != last {
+                result.push(ParseResult::Corrupted(*character));
+                continue 'outer;
             }
         }
 
-        if ok && stack.is_empty() {
+        if stack.is_empty() {
             result.push(ParseResult::Ok);
-        } else if ok {
+        } else {
             result.push(ParseResult::Incomplete(stack));
         }
     }
