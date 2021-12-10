@@ -29,20 +29,19 @@ fn parse_lines(input: &Vec<Vec<char>>) -> Result<Vec<ParseResult>, ParseError> {
         for c in line {
             if open.contains(c) {
                 stack.push(*c);
+                continue;
             }
 
-            if close.contains(c) {
-                let index = close.iter().position(|v| v == c).ok_or(ParseError::new("Illegal character"))?;
-                if let Some(v) = stack.pop() {
-                    let o = open.get(index).ok_or(ParseError::new("Could not find corresponding opening char"))?;
-                    if *o != v {
-                        result.push(ParseResult::Corrupted(*c));
-                        ok = false;
-                        break;
-                    }
-                }
+            let index = close.iter().position(|v| v == c).ok_or(ParseError::new("Illegal character"))?;
+            let v = stack.pop().ok_or(ParseError::new("Stack is empty"))?;
+            let o = open.get(index).ok_or(ParseError::new("Could not find corresponding opening char"))?;
+            if *o != v {
+                result.push(ParseResult::Corrupted(*c));
+                ok = false;
+                break;
             }
         }
+
         if ok && stack.is_empty() {
             result.push(ParseResult::Ok);
         } else if ok {
