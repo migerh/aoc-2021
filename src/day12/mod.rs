@@ -1,11 +1,13 @@
+use std::collections::hash_map::DefaultHasher;
 use std::collections::HashMap;
 use std::str::FromStr;
+use std::hash::{Hash, Hasher};
 use crate::utils::ParseError;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Cave {
-    Big(Vec<char>),
-    Small(Vec<char>),
+    Big(u64),
+    Small(u64),
     Start,
     End,
 }
@@ -16,11 +18,14 @@ impl FromStr for Cave {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let is_lowercase = s.to_lowercase().as_str() == s;
         let ch = s.chars().collect::<Vec<_>>();
+        let mut hash = DefaultHasher::new();
+        ch.hash(&mut hash);
+        let data = hash.finish();
 
         let cave = match s {
             "start" => Cave::Start,
             "end" => Cave::End,
-            _ => if is_lowercase { Cave::Small(ch) } else { Cave::Big(ch) }
+            _ => if is_lowercase { Cave::Small(data) } else { Cave::Big(data) }
         };
 
         Ok(cave)
