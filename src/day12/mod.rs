@@ -120,7 +120,34 @@ mod test {
     use super::*;
     use crate::utils::ParseError;
 
-    fn sample() -> &'static str {
+    fn sample1() -> &'static str {
+        "start-A
+start-b
+A-c
+A-b
+b-d
+A-end
+b-end
+dc-end"
+    }
+
+    fn input1() -> Result<Caves, ParseError> {
+        Ok(input_generator(sample1())?)
+    }
+
+    #[test]
+    fn part1_sample() -> Result<(), ParseError> {
+        let data = input1()?;
+        Ok(assert_eq!(10, solve_part1(&data)?))
+    }
+
+    #[test]
+    fn part2_sample() -> Result<(), ParseError> {
+        let data = input1()?;
+        Ok(assert_eq!(36, solve_part2(&data)?))
+    }
+
+    fn sample2() -> &'static str {
         "dc-end
 HN-start
 start-kj
@@ -133,19 +160,19 @@ kj-HN
 kj-dc"
     }
 
-    fn input() -> Result<Caves, ParseError> {
-        Ok(input_generator(sample())?)
+    fn input2() -> Result<Caves, ParseError> {
+        Ok(input_generator(sample2())?)
     }
 
     #[test]
-    fn part1_sample() -> Result<(), ParseError> {
-        let data = input()?;
+    fn part1_sample2() -> Result<(), ParseError> {
+        let data = input2()?;
         Ok(assert_eq!(19, solve_part1(&data)?))
     }
 
     #[test]
-    fn part2_sample() -> Result<(), ParseError> {
-        let data = input()?;
+    fn part2_sample2() -> Result<(), ParseError> {
+        let data = input2()?;
         Ok(assert_eq!(103, solve_part2(&data)?))
     }
 }
