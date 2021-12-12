@@ -79,40 +79,25 @@ pub fn travel(start: Cave, caves: &Caves, path: Vec<Cave>, visited: HashMap<Cave
     }
 
     let mut results = vec![];
-    let candidates = caves.paths.iter().filter(|p| p[0] == start);
-    for c in candidates {
-        let t = c[1].clone();
-        if let Cave::Small(_) = t {
-            if visited.contains_key(&t) {
-                if !part2 || one_small_visited_twice(&visited) {
-                    continue;
+    let direction = vec![(0, 1), (1, 0)];
+    for d in direction {
+        let candidates = caves.paths.iter().filter(|p| p[d.0] == start);
+        for c in candidates {
+            let t = c[d.1].clone();
+            if let Cave::Small(_) = t {
+                if visited.contains_key(&t) {
+                    if !part2 || one_small_visited_twice(&visited) {
+                        continue;
+                    }
                 }
             }
-        }
 
-        if t == Cave::Start {
-            continue;
-        }
-
-        results.append(&mut travel(c[1].clone(), caves, path.clone(), visited.clone(), part2));
-    }
-
-    let candidates = caves.paths.iter().filter(|p| p[1] == start);
-    for c in candidates {
-        let t = c[0].clone();
-        if let Cave::Small(_) = t{
-            if visited.contains_key(&t) {
-                if !part2 || one_small_visited_twice(&visited) {
-                    continue;
-                }
+            if t == Cave::Start {
+                continue;
             }
-        }
 
-        if t == Cave::Start {
-            continue;
+            results.append(&mut travel(c[d.1].clone(), caves, path.clone(), visited.clone(), part2));
         }
-
-        results.append(&mut travel(c[0].clone(), caves, path.clone(), visited.clone(), part2));
     }
 
     results
