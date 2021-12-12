@@ -1,6 +1,5 @@
-use std::collections::HashSet;
+use std::collections::HashMap;
 use std::str::FromStr;
-use std::num::ParseIntError;
 use crate::utils::ParseError;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -52,10 +51,27 @@ pub fn input_generator(input: &str) -> Result<Caves, ParseError> {
     Caves::from_str(input)
 }
 
-pub fn travel(start: Cave, caves: &Caves, path: Vec<Cave>, visited: HashSet<Cave>) -> Vec<Vec<Cave>> {
+pub fn one_small_visited_twice(visited: &HashMap<Cave, usize>) -> bool {
+    let number_small_ones_visited_twice = visited.iter().filter(|(k, v)| {
+        if let Cave::Small(_) = k {
+            if **v == 2 {
+                true
+            } else {
+                false
+            }
+        } else {
+            false
+        }
+    })
+    .count();
+
+    number_small_ones_visited_twice > 0
+}
+
+pub fn travel(start: Cave, caves: &Caves, path: Vec<Cave>, visited: HashMap<Cave, usize>, part2: bool) -> Vec<Vec<Cave>> {
     let mut visited = visited;
     let mut path = path;
-    visited.insert(start.clone());
+    visited.entry(start.clone()).and_modify(|v| *v += 1).or_insert(1);
     path.push(start.clone());
 
     if start == Cave::End {
@@ -66,9 +82,11 @@ pub fn travel(start: Cave, caves: &Caves, path: Vec<Cave>, visited: HashSet<Cave
     let candidates = caves.paths.iter().filter(|p| p[0] == start);
     for c in candidates {
         let t = c[1].clone();
-        if let Cave::Small(_) = t{
-            if visited.contains(&t) {
-                continue;
+        if let Cave::Small(_) = t {
+            if visited.contains_key(&t) {
+                if !part2 || one_small_visited_twice(&visited) {
+                    continue;
+                }
             }
         }
 
@@ -76,15 +94,17 @@ pub fn travel(start: Cave, caves: &Caves, path: Vec<Cave>, visited: HashSet<Cave
             continue;
         }
 
-        results.append(&mut travel(c[1].clone(), caves, path.clone(), visited.clone()));
+        results.append(&mut travel(c[1].clone(), caves, path.clone(), visited.clone(), part2));
     }
 
     let candidates = caves.paths.iter().filter(|p| p[1] == start);
     for c in candidates {
         let t = c[0].clone();
         if let Cave::Small(_) = t{
-            if visited.contains(&t) {
-                continue;
+            if visited.contains_key(&t) {
+                if !part2 || one_small_visited_twice(&visited) {
+                    continue;
+                }
             }
         }
 
@@ -92,7 +112,7 @@ pub fn travel(start: Cave, caves: &Caves, path: Vec<Cave>, visited: HashSet<Cave
             continue;
         }
 
-        results.append(&mut travel(c[0].clone(), caves, path.clone(), visited.clone()));
+        results.append(&mut travel(c[0].clone(), caves, path.clone(), visited.clone(), part2));
     }
 
     results
@@ -100,14 +120,14 @@ pub fn travel(start: Cave, caves: &Caves, path: Vec<Cave>, visited: HashSet<Cave
 
 #[aoc(day12, part1)]
 pub fn solve_part1(input: &Caves) -> Result<usize, ParseError> {
-    let valid_paths = travel(Cave::Start, input, vec![], HashSet::new());
-
+    let valid_paths = travel(Cave::Start, input, vec![], HashMap::new(), false);
     Ok(valid_paths.len())
 }
 
 #[aoc(day12, part2)]
-pub fn solve_part2(input: &Caves) -> Result<i32, ParseError> {
-    Ok(0)
+pub fn solve_part2(input: &Caves) -> Result<usize, ParseError> {
+    let valid_paths = travel(Cave::Start, input, vec![], HashMap::new(), true);
+    Ok(valid_paths.len())
 }
 
 #[cfg(test)]
@@ -116,22 +136,31 @@ mod test {
     use crate::utils::ParseError;
 
     fn sample() -> &'static str {
-        ""
+        "dc-end
+HN-start
+start-kj
+dc-start
+dc-HN
+LN-dc
+HN-end
+kj-sa
+kj-HN
+kj-dc"
     }
 
-    fn input() -> Result<Vec<i32>, ParseError> {
+    fn input() -> Result<Caves, ParseError> {
         Ok(input_generator(sample())?)
     }
 
     #[test]
     fn part1_sample() -> Result<(), ParseError> {
         let data = input()?;
-        Ok(assert_eq!(0, solve_part1(&data)?))
+        Ok(assert_eq!(19, solve_part1(&data)?))
     }
 
     #[test]
     fn part2_sample() -> Result<(), ParseError> {
         let data = input()?;
-        Ok(assert_eq!(0, solve_part2(&data)?))
+        Ok(assert_eq!(103, solve_part2(&data)?))
     }
 }
