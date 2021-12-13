@@ -103,9 +103,9 @@ fn print(input: &Vec<Vec<bool>>) {
     for y in 0..input.len() {
         for x in 0..input[y].len() {
             if input[y][x] {
-                print!("x");
+                print!("#");
             } else {
-                print!(".");
+                print!(" ");
             }
         }
         println!("");
