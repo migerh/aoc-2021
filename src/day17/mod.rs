@@ -97,7 +97,7 @@ pub fn solve_part2(input: &TargetArea) -> Result<i32, ParseError> {
                 continue;
             }
 
-            if let Some(new_y) = shoot((x, y), target) {
+            if let Some(_) = shoot((x, y), target) {
                 valid += 1;
             }
         }
