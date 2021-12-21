@@ -25,9 +25,11 @@ impl Game {
         }
     }
 
-    fn tick(&mut self, player: usize, sum: usize) {
+    fn tick(&mut self, sum: usize) {
+        let player = self.player;
         self.players[player] = (self.players[player] - 1 + sum) % 10 + 1;
         self.scores[player] += self.players[player];
+        self.player = (player + 1) % 2;
     }
 }
 
@@ -58,13 +60,11 @@ pub fn input_generator(_input: &str) -> Game {
 #[aoc(day21, part1)]
 pub fn solve_part1(input: &Game) -> Result<usize, ParseError> {
     let mut game = input.clone();
-    let mut player = 0;
     let mut die = Die::new();
 
     while !game.over() {
         let roll = die.roll_det() + die.roll_det() + die.roll_det();
-        game.tick(player, roll);
-        player = (player + 1) % 2;
+        game.tick(roll);
     }
 
     let score = if game.scores[0] < 1000 {
@@ -76,7 +76,10 @@ pub fn solve_part1(input: &Game) -> Result<usize, ParseError> {
 }
 
 fn number_of_wins(player: usize, games: &HashMap<Game, usize>) -> usize {
-    games.iter().filter(|(game, _)| game.player == player).map(|(_, num)| num).sum()
+    // The player in the state is the _next_ player to play the game
+    // so the winner is actually the *other* player.
+    let filter = (player + 1) % 2;
+    games.iter().filter(|(game, _)| game.player == filter).map(|(_, num)| num).sum()
 }
 
 #[aoc(day21, part2)]
@@ -95,12 +98,11 @@ pub fn solve_part2(input: &Game) -> Result<usize, ParseError> {
                     for d3 in 1..=3 {
                         let sum = d1 + d2 + d3;
                         let mut new_game = game.clone();
-                        new_game.tick(game.player, sum);
+                        new_game.tick(sum);
 
                         if new_game.scores[game.player] >= 21 {
                             finished_games.entry(new_game).and_modify(|v| *v += num).or_insert(num);
                         } else {
-                            new_game.player = (game.player + 1) % 2;
                             next_games.entry(new_game).and_modify(|v| *v += num).or_insert(num);
                         }
                     }
