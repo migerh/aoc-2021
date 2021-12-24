@@ -34,6 +34,7 @@ pub fn input_generator(_input: &str) -> Result<Rooms, ParseIntError> {
 }
 
 impl Rooms {
+    #[allow(dead_code)]
     fn possible_movements(&self) -> Vec<(usize, usize)> {
         // get the top row out of their rooms, that are not in their
         // rooms yet or still have visitors.
@@ -44,12 +45,12 @@ impl Rooms {
 
 #[aoc(day23, part1)]
 pub fn solve_part1(input: &Rooms) -> Result<i32, ParseError> {
-    let rooms = input.clone();
+    let _rooms = input.clone();
     Ok(0)
 }
 
 #[aoc(day23, part2)]
-pub fn solve_part2(input: &Rooms) -> Result<i32, ParseError> {
+pub fn solve_part2(_input: &Rooms) -> Result<i32, ParseError> {
     Ok(0)
 }
 

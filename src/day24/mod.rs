@@ -94,7 +94,7 @@ fn to_num(v: Vec<i64>) -> i64 {
 // tried: 51131616112781
 // tried: 59998494939729
 #[aoc(day24, part1)]
-pub fn solve_part1(input: &i64) -> Result<i64, ParseError> {
+pub fn solve_part1(_input: &i64) -> Result<i64, ParseError> {
     let numbers = monad(0, 0);
 
     let max = numbers.into_iter().map(|v| to_num(v.into_iter().rev().collect::<Vec<_>>())).max().unwrap();
@@ -103,7 +103,7 @@ pub fn solve_part1(input: &i64) -> Result<i64, ParseError> {
 }
 
 #[aoc(day24, part2)]
-pub fn solve_part2(input: &i64) -> Result<i64, ParseError> {
+pub fn solve_part2(_input: &i64) -> Result<i64, ParseError> {
     let numbers = monad(0, 0);
 
     let min = numbers.into_iter().map(|v| to_num(v.into_iter().rev().collect::<Vec<_>>())).min().unwrap();
