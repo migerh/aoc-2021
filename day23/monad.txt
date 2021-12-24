@@ -1,0 +1,84 @@
+w = IN
+x = 0
+x += z
+x %= 26
+z /= AAA
+x += BBB
+
+
+
+
+
+
+x = z % 26 + BBB
+z /= AAA
+if x != w {
+  y = 26
+  z *= y
+  z += w+CCC
+}
+
+
+#01 AAA = 1, BBB = 11, CCC = 8
+#02 AAA = 1, BBB = 14, CCC = 13
+#03 AAA = 1, BBB = 10, CCC = 2
+#04 AAA = 26, BBB = 0, CCC = 7
+#05 AAA = 1, BBB = 12, CCC = 11
+#06 AAA = 1, BBB = 12, CCC = 4
+#07 AAA = 1, BBB = 12, CCC = 13
+#08 AAA = 26, BBB = -8, CCC = 13
+#09 AAA = 26, BBB = -9, CCC = 10
+#10 AAA = 1, BBB = 11, CCC = 1
+#11 AAA = 26, BBB = 0, CCC = 2
+#12 AAA = 26, BBB = -5, CCC = 14
+#13 AAA = 26, BBB = 06, CCC = 6
+#14 AAA = 26, BBB = -12, CCC = 14
+
+
+
+w = IN
+x = 0
+x += z
+x %= 26
+z /= 1
+x += 11
+
+if x != w {
+  y = 26
+  z *= y
+  z += w+8
+}
+
+
+
+w = IN
+x = 0
+x += z
+x %= 26
+z /= 1
+x += 14
+
+if x != w {
+  y = 26
+  z *= y
+  z += w+13
+}
+
+
+
+w = IN
+x = 0
+x += z
+x %= 26
+z /= 1
+x += 10
+
+if x != w {
+  y = 26
+  z *= y
+  z += w+2
+}
+
+
+
+
