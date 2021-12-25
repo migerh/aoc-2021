@@ -110,29 +110,3 @@ pub fn solve_part2(_input: &i64) -> Result<i64, ParseError> {
 
     Ok(min)
 }
-
-#[cfg(test)]
-mod test {
-    use super::*;
-    use crate::utils::ParseError;
-
-    fn sample() -> &'static str {
-        ""
-    }
-
-    fn input() -> Result<i64, ParseError> {
-        Ok(input_generator(sample())?)
-    }
-
-    #[test]
-    fn part1_sample() -> Result<(), ParseError> {
-        let data = input()?;
-        Ok(assert_eq!(0, solve_part1(&data)?))
-    }
-
-    #[test]
-    fn part2_sample() -> Result<(), ParseError> {
-        let data = input()?;
-        Ok(assert_eq!(0, solve_part2(&data)?))
-    }
-}
